@@ -1,0 +1,70 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask CRUD + Image Filter</title>
+</head>
+<body>
+    <h1>Student Database</h1>
+
+    {% if edit_student %}
+    <h2>Update Student</h2>
+    {% else %}
+    <h2>Add New Student</h2>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('update_student') if edit_student else '/add_student' }}">
+        Student ID:
+        <input type="text" name="student_id" value="{{ edit_student.student_id if edit_student }}" 
+               {% if edit_student %}readonly{% endif %} required><br>
+
+        First Name:
+        <input type="text" name="first_name" value="{{ edit_student.first_name if edit_student }}"><br>
+
+        Last Name:
+        <input type="text" name="last_name" value="{{ edit_student.last_name if edit_student }}"><br>
+
+        DOB:
+        <input type="date" name="dob" value="{{ edit_student.dob if edit_student }}"><br>
+
+        Amount Due:
+        <input type="text" name="amount_due" value="{{ edit_student.amount_due if edit_student }}"><br>
+
+        <input type="submit" value="{{ 'Update' if edit_student else 'Submit' }}">
+    </form>
+
+    <h2>All Students</h2>
+    <table border="1">
+        <tr>
+            <th>ID</th><th>First Name</th><th>Last Name</th><th>DOB</th><th>Amount Due</th><th>Action</th>
+        </tr>
+        {% for _, row in students.iterrows() %}
+        <tr>
+            <td>{{ row.student_id }}</td>
+            <td>{{ row.first_name }}</td>
+            <td>{{ row.last_name }}</td>
+            <td>{{ row.dob }}</td>
+            <td>{{ row.amount_due }}</td>
+            <td>
+                <a href="/delete_student/{{ row.student_id }}">Delete</a> |
+                <a href="/edit_student/{{ row.student_id }}">Edit</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Upload Image for Colored Sketch</h2>
+    <form action="/upload_image" method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" required>
+        <input type="submit" value="Upload and Sketch">
+    </form>
+
+    {% if sketch_filename %}
+        <h3>Result:</h3>
+        <img src="{{ url_for('uploaded_file', filename=sketch_filename) }}" width="400">
+    {% endif %}
+</body>
+</html>
+
